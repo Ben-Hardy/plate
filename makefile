@@ -1,4 +1,4 @@
-C=gcc
+C=gcc-4.9
 CFLAGS=-Wall -pedantic -std=c99 -O3
 
 executables=plate
