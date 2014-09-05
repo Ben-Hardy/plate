@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define _GNU_SOURCE
+
 // the following are the sums of various input strings
 #define TXT 352 
 #define CLANG 99
@@ -40,4 +42,5 @@
 #define OCAML 524
 #define ERLANG 633
 #define COFFEE 1277
+
 #endif
