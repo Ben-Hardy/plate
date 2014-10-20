@@ -88,7 +88,8 @@ int anlzstr( char* str ) { // this will probably be pretty ugly. Big block of if
         case PHP:        if ( strcmp( str, "php" ) == 0 )            return PHP;
         case OCAML:      if ( strcmp( str, "ocaml" ) == 0 )          return OCAML;
         case ERLANG:     if ( strcmp( str, "erlang" ) == 0 )         return ERLANG;
-        case COFFEE:     if ( strcmp( str, "coffeescript" ) == 0 )   return  COFFEE;
+        case COFFEE:     if ( strcmp( str, "coffeescript" ) == 0 )   return COFFEE;
+        case MD:     if ( strcmp( str, "markdown" ) == 0 )   return MD;
         default: printhelp();
     }
 
@@ -540,6 +541,16 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
                 else { 
                     char templ[] = "Console.log(\"Hello World!\")\n\n"; 
+                    createfile( name, templ );
+                    free( name );
+                    name = NULL;
+                }
+                break;
+            case MD:  // markdown 
+                err = asprintf( &name, "%s.md", filenames[i] );
+                if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
+                else { 
+                    char templ[] = "# Title\n\n## Header 1"; 
                     createfile( name, templ );
                     free( name );
                     name = NULL;

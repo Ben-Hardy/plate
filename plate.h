@@ -42,5 +42,6 @@
 #define OCAML 524
 #define ERLANG 633
 #define COFFEE 1277
+#define MD 867
 
 #endif
