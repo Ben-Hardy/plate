@@ -20,7 +20,7 @@ File names containing multiple words are handled by simply placing a set of quot
 
 Supported languages: (To the right of each language name is the accompanying argument to supply to plate). 
 
-##### Note:C/h is a C file with accompanying header file. C++/h is a C++ file with accompanying .h file):
+##### Note: C/h is a C file with accompanying header file. C++/h is a C++ file with accompanying .h file):
 -   Text         -  txt
 -   C            -  c
 -   C++          -  c++
