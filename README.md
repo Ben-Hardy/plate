@@ -1,9 +1,9 @@
-                  __________   ___            _____    ___________   __________
-                 /  ____   /  /  /          /  ___  \  \____   ___\  \   ______\
-                /  /___/  /  /  /          /  /___\  \      \  \      \  \_____
-               /  _______/  /  /          /  _______  \      \  \      \   ____\
-              /  /         /  /_______   /  /       \  \      \  \      \  \______
-             /__/         /__________/  /__/         \__\      \__\      \________\
+                     __________   ___            _____    ___________   __________
+                    /  ____   /  /  /          /  ___  \  \____   ___\  \   ______\
+                   /  /___/  /  /  /          /  /___\  \      \  \      \  \_____
+                  /  _______/  /  /          /  _______  \      \  \      \   ____\
+                 /  /         /  /_______   /  /       \  \      \  \      \  \______
+                /__/         /__________/  /__/         \__\      \__\      \________\
 
 
 Plate is a UNIX program which provides a file containing a simple template for a requested programming language, shell script, makefile, or LaTeX file structure. Plate is useful for rapid prototyping, testing new systems (each template comes with a hello world equivalent that is tested works so plate templates can be used to test and make sure a new install of a compiler or interpreter works correctly)
