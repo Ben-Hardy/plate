@@ -20,29 +20,29 @@ File names containing multiple words are handled by simply placing a set of quot
 
 Supported languages: (beside each language name is the accompanying argument to supply to plate. 
 
-##### Note:C/h is a C file with accompanying header file. C++/h is a C++ file with accompanying .h file)
-
-Text         txt
-C             c
-C++           c++
-.h            h
-C/h           ch\nC++/h         c++h
-Google Go     go
-Haskell       haskell
-Prolog        prolog
-Python        python
-Javascript    javascript
-CoffeeScript  coffeescript
-HTML          html
-HTML/script   htmlscript
-CSS           css
-Ruby          ruby
-JQuery        jquery
-PHP           php
-Scala         scala
-Erlang        erlang
-ML            ml
-
+##### Note:C/h is a C file with accompanying header file. C++/h is a C++ file with accompanying .h file):
+-   Text         txt
+-   C             c
+-   C++           c++
+-   .h            h
+-   C/h           ch
+-   C++/h         c++h
+-   Google Go     go
+-   Haskell       haskell
+-   Prolog        prolog
+-   Python        python
+-   Javascript    javascript
+-   CoffeeScript  coffeescript
+-   HTML          html
+-   HTML/script   htmlscript
+-   CSS           css
+-   Ruby          ruby
+-   JQuery        jquery
+-   PHP           php
+-   Scala         scala
+-   Erlang        erlang
+-   ML            ml
+-   Markdown      md
 A number of script stubs are also available:
 sh            sh
 bash          bash
