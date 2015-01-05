@@ -43,6 +43,7 @@ Supported languages: (beside each language name is the accompanying argument to 
 -   Erlang        erlang
 -   ML            ml
 -   Markdown      md
+
 A number of script stubs are also available:
 sh            sh
 bash          bash
