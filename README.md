@@ -56,10 +56,10 @@ scala script  scalascript
 
 Simple Makefiles of the following types are also available:
 
-C makefile          cmake
+C makefile                    cmake
 
-C++ makefile        c++make
+C++ makefile                  c++make
 
-c w/ .h and make    chmake
+c file w/ .h and makefile     chmake
 
-c++ w/ .h and make  c++hmake
+c++ file w/ .h and makefile   c++hmake
