@@ -18,7 +18,7 @@ For example:
 
 File names containing multiple words are handled by simply placing a set of quotation marks around the file name argument.
 
-Supported languages: (beside each language name is the accompanying argument to supply to plate. 
+Supported languages: (To the right of each language name is the accompanying argument to supply to plate). 
 
 ##### Note:C/h is a C file with accompanying header file. C++/h is a C++ file with accompanying .h file):
 -   Text         txt
@@ -56,7 +56,7 @@ Python Script pythonscript
 scala script  scalascript
 
 Simple Makefiles of the following types are also available:
--   C makefile                    cmake
--   C++ makefile                  c++make
--   c file w/ .h and makefile     chmake
--   c++ file w/ .h and makefile   c++hmake
+-   C makefile                   - cmake
+-   C++ makefile                 - c++make
+-   c file w/ .h and makefile    - chmake
+-   c++ file w/ .h and makefile  - c++hmake
