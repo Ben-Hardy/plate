@@ -22,27 +22,27 @@ Supported languages: (beside each language name is the accompanying argument to 
 
 ##### Note:C/h is a C file with accompanying header file. C++/h is a C++ file with accompanying .h file):
 -   Text         txt
--   C             c
--   C++           c++
--   .h            h
--   C/h           ch
--   C++/h         c++h
--   Google Go     go
--   Haskell       haskell
--   Prolog        prolog
--   Python        python
--   Javascript    javascript
--   CoffeeScript  coffeescript
--   HTML          html
--   HTML/script   htmlscript
--   CSS           css
--   Ruby          ruby
--   JQuery        jquery
--   PHP           php
--   Scala         scala
--   Erlang        erlang
--   ML            ml
--   Markdown      md
+-   C            -  c
+-   C++          -  c++
+-   .h           -  h
+-   C/h          -  ch
+-   C++/h        -  c++h
+-   Google Go    -  go
+-   Haskell      -  haskell
+-   Prolog       -  prolog
+-   Python       -  python
+-   Javascript   -  javascript
+-   CoffeeScript -  coffeescript
+-   HTML         -  html
+-   HTML/script  -  htmlscript
+-   CSS          -  css
+-   Ruby         -  ruby
+-   JQuery       -  jquery
+-   PHP          -  php
+-   Scala        -  scala
+-   Erlang       -  erlang
+-   ML           -  ml
+-   Markdown     -  md
 
 A number of script stubs are also available:
 sh            sh
@@ -56,11 +56,7 @@ Python Script pythonscript
 scala script  scalascript
 
 Simple Makefiles of the following types are also available:
-
-C makefile                    cmake
-
-C++ makefile                  c++make
-
-c file w/ .h and makefile     chmake
-
-c++ file w/ .h and makefile   c++hmake
+-   C makefile                    cmake
+-   C++ makefile                  c++make
+-   c file w/ .h and makefile     chmake
+-   c++ file w/ .h and makefile   c++hmake
