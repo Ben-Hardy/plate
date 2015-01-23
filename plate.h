@@ -7,7 +7,7 @@
 
 #define _GNU_SOURCE
 
-// the following are the sums of various input strings
+// the following are the sums of the ascii codes of various input strings
 #define TXT 352 
 #define CLANG 99
 #define CPLUSPLUS 185

@@ -265,7 +265,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                 }
                 break;
             case CPPHMAKE: // C++ wih header file
-                err = asprintf( &name, "%s.c", filenames[i] );
+                err = asprintf( &name, "%s.cc", filenames[i] );
                 char *hmfile;
                 err = asprintf( &hmfile, "%s.h", filenames[i] );
                 if ( fileexists( name ) || fileexists( hmfile ) ) {  printf( "The file %s or %s already exists!\n", name, hmfile );  break;}
@@ -565,26 +565,6 @@ void makefile( char** filenames, char* lang, int numfiles ) {
 
 }
 
-// doesn't quite work yet.
-/*
-void test( void ) {
-    char** test;
-    int i = 1;
-    err = asprintf( &test[0], "test%d", i );
-    i++;
-    makefile( test, "ch",      2 );
-    makefile( test, "c++h",    2 );
-    makefile( test, "java",    2 );
-    makefile( test, "python",  2 );
-    makefile( test, "go",      2 );
-    makefile( test, "scala",   2 );
-    makefile( test, "haskell", 2 );
-    makefile( test, "sh",      2 );
-    makefile( test, "bash",    2 );
-    makefile( test, "zsh",     2 );
-
-}
-*/
 
 int main( int argc, char** argv ){
     if ( argc == 1|| calcstrsum(argv[1]) == 425 || calcstrsum( argv[1] ) ==  149 ) printhelp();

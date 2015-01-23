@@ -1,11 +1,14 @@
-C=gcc-4.9
+C=gcc
 CFLAGS=-Wall -pedantic -std=c99 -O3
 
 executables=plate
 
+plate: plate.o
+	$(C) $(CFLAGS) plate.o -o plate
+
 plate.o: plate.c
-	$(C) $(CFLAGS) plate.c -o plate
+	$(C) $(CFLAGS) -c plate.c
 
 clean:
-	rm -rf plate
+	rm -rf plate plate.o
 
