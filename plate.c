@@ -249,6 +249,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     free( make );
                     make = NULL;
                 }
+            	break;
             case CPPMAKE:
                 err = asprintf( &name, "%s.cc", filenames[i] );
                 if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
@@ -536,6 +537,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     free( name );
                     name = NULL;
                 }
+                break;
             case COFFEE:  // coffeescript 
                 err = asprintf( &name, "%s.coffee", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
