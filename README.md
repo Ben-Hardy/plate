@@ -6,7 +6,7 @@
                 /__/         /__________/  /__/         \__\      \__\      \________\
 
 
-Plate is a UNIX program which provides a file containing a simple template for a requested programming language, shell script, makefile, or LaTeX file structure. Plate is useful for rapid prototyping, testing new systems (each template comes with a hello world equivalent that is tested works so plate templates can be used to test and make sure a new install of a compiler or interpreter works correctly)
+Plate is a UNIX program which provides a file containing a simple template for a requested programming language, shell script, or makefile. Plate is useful for rapid prototyping, testing new systems (each template comes with a hello world equivalent that is tested and is known to work so plate templates can be used to test and make sure a new install of a compiler or interpreter is working correctly)
 
 To use Plate, simply provide the following command to the terminal:
      plate language filename
