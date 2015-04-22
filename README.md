@@ -45,15 +45,15 @@ Supported languages: (To the right of each language name is the accompanying arg
 -   Markdown     -  md
 
 A number of script stubs are also available:
-sh            sh
-bash          bash
-ksh           ksh
-zsh           zsh
-csh           csh
-PERL script   perls
-Node script   nodescript
-Python Script pythonscript
-scala script  scalascript
+-   sh          -  sh
+-   bash        -  bash
+-   ksh              -  ksh
+-   zsh              -  zsh
+-   csh              -  csh
+-   PERL script      -  perls
+-   Node script      -  nodescript
+-   Python Script    -  pythonscript
+-   scala script     -  scalascript
 
 Simple Makefiles of the following types are also available:
 -   C makefile                   - cmake
