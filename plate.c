@@ -89,7 +89,7 @@ int anlzstr( char* str ) { // this will probably be pretty ugly. Big block of if
         case OCAML:      if ( strcmp( str, "ocaml" ) == 0 )          return OCAML;
         case ERLANG:     if ( strcmp( str, "erlang" ) == 0 )         return ERLANG;
         case COFFEE:     if ( strcmp( str, "coffeescript" ) == 0 )   return COFFEE;
-        case MD:     if ( strcmp( str, "markdown" ) == 0 )   return MD;
+        case MD:         if ( strcmp( str, "markdown" ) == 0 )       return MD;
         default: printhelp();
     }
 
@@ -111,7 +111,8 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                 else {
                     createfile( filenames[i], "" );
                 }
-            break; 
+                break; 
+
             case CLANG: // C file case
                 err = asprintf( &name, "%s.c", filenames[i] );
 		        if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
@@ -151,6 +152,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     upper = NULL;
                 }
                 break;
+
             case CH: // C file with an accompanying .h file.
                 err = asprintf( &name, "%s.c", filenames[i] );
                 char *chfile;
@@ -176,6 +178,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     htempl = NULL;
                 }
                 break;
+
             case CPPH: // C++ wih header file
                 err = asprintf( &name, "%s.c", filenames[i] );  // for future reference, cannot start switch cases/if statements with declarations, must start with statements or else will not compile!
                 char *hfile;
@@ -203,6 +206,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     htempl = NULL;
                 }
                 break;
+
             case CMAKE:
                 err = asprintf( &name, "%s.c", filenames[i] );
                 if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
@@ -218,6 +222,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     make = NULL;
                 }
                 break;
+
             case CHMAKE: // C file with an accompanying .h file and makefile
                 err = asprintf( &name, "%s.c", filenames[i] );
                 char *chmfile;
@@ -250,6 +255,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     make = NULL;
                 }
             	break;
+
             case CPPMAKE:
                 err = asprintf( &name, "%s.cc", filenames[i] );
                 if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
@@ -265,6 +271,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     make = NULL;
                 }
                 break;
+
             case CPPHMAKE: // C++ wih header file
                 err = asprintf( &name, "%s.cc", filenames[i] );
                 char *hmfile;
@@ -297,6 +304,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     make = NULL;
                 }
                 break;
+
             case JAVA: // java!
                 if ( filenames[i][0] >= 97 && filenames[i][0] <= 122 ) // if the first character of the filename is a small letter, capitalize it!
                     filenames[i][0] -= 32;
@@ -312,6 +320,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     templ = NULL;
                 }
                 break;
+
             case PYTHON: // python!
                 err = asprintf( &name, "%s.py", filenames[i] );
                 if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
@@ -322,6 +331,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case GO: // Google Go AKA golang
                 err = asprintf( &name, "%s.go", filenames[i] );
                 if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
@@ -332,6 +342,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case SCALA: // scala!
                 if (filenames[i][0] >= 97 && filenames[i][0] <= 122) // if the first character of the filename is a small letter, capitalize it!
                     filenames[i][0] -= 32;
@@ -347,6 +358,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     templ = NULL;
                 }
                 break;
+
             case HASKELL: // haskell
                 err = asprintf( &name, "%s.hs", filenames[i] );
                 if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
@@ -357,6 +369,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case SH:  // basic sh script
                 err = asprintf( &name, "%s.sh", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -367,6 +380,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case BASH: // bash script
                 err = asprintf( &name, "%s.sh", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -377,6 +391,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
                 // the one below is iffy. zsh is sometimes in usr/bin or usr/local/bin, depending on OS. On Mac, it is in usr/bin. On some Linux distros, it is in one of the three above directories.
             case ZSH: // zsh script
                 err = asprintf( &name, "%s.sh", filenames[i] );
@@ -388,6 +403,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case KSH: // ksh script
                 err = asprintf( &name, "%s.sh", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -398,6 +414,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case CSH: // csh script
                 err = asprintf( &name, "%s.sh", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -408,6 +425,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case PERL:  // Perl script
                 err = asprintf( &name, "%s", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -418,6 +436,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case SCALAS: // scala script
                 err = asprintf( &name, "%s", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -428,6 +447,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case NODES: // node script
                 err = asprintf( &name, "%s", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -438,6 +458,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case PYTHONS: // python script
                 err = asprintf( &name, "%s", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -448,6 +469,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case HTML:  // basic html file
                 err = asprintf( &name, "%s.html", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -458,6 +480,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case HTMLS:  // html with script tag
                 err = asprintf( &name, "%s.html", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -468,6 +491,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case CSS: // rudementary CSS file
                 err = asprintf( &name, "%s.css", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -478,6 +502,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case JAVASCRIPT: // basic javascript file with a makeshift main since main isn't required in JS
                 err = asprintf( &name, "%s.js", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -488,6 +513,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case RUBY:  // ruby
                 err = asprintf( &name, "%s.rb", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -498,6 +524,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case JQUERY:  // JQuery
                 err = asprintf( &name, "%s.js", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -508,6 +535,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case PHP: // PHP for posterity's sake
                 err = asprintf( &name, "%s.php", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -518,6 +546,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case OCAML:  // Objective-CAML
                 err = asprintf( &name, "%s.ml", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -528,6 +557,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case ERLANG: // erlang!
                 err = asprintf( &name, "%s.erl", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -538,6 +568,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case COFFEE:  // coffeescript 
                 err = asprintf( &name, "%s.coffee", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -548,6 +579,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+
             case MD:  // markdown 
                 err = asprintf( &name, "%s.md", filenames[i] );
                 if ( fileexists( name ) ) printf( "The file %s already exists!\n", name );
@@ -558,6 +590,7 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                     name = NULL;
                 }
                 break;
+                
             default:
                 printf( "the file %s was not successfully created! Check command formatting. For help, use \"plate -h\" or \"plate help\"\n", filenames[i] );
         }
