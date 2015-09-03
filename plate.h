@@ -4,8 +4,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #define _GNU_SOURCE
+
+#define TRUE 1
+#define FALSE 0
 
 // the following are the sums of the ascii codes of various input strings
 #define TXT 352 
@@ -15,6 +20,7 @@
 #define CPPMAKE 599
 #define CHMAKE 617
 #define CPPHMAKE 703
+#define CPROJ 542
 #define HFILE 104
 #define CH 203
 #define CPPH 289

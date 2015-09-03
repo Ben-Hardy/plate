@@ -3,7 +3,7 @@
 
 /* prints help information to standard output. C90 does not like the length of this string hahaha */
 void printhelp( void ) {
-    char help[] = "\n\n          __________   ___            _____    ___________   __________\n         /  ____   /  /  /          /  ___  \\  \\____   ___\\  \\   ______\\\n        /  /___/  /  /  /          /  /___\\  \\      \\  \\      \\  \\_____\n       /  _______/  /  /          /  _______  \\      \\  \\      \\   ____\\\n      /  /         /  /_______   /  /       \\  \\      \\  \\      \\  \\______\n     /__/         /__________/  /__/         \\__\\      \\__\\      \\________\\\n\nPlate is a UNIX program which provides a file containing a simple template for a requested programming language, shell script, makefile, or LaTeX file structure.\n\nTo use Plate, simply provide the following command to the terminal:\n\n\tplate language filename\n\nPlate can handle creating multiple simply by adding more arguments to the input command.\n\nFor example:\n\n\tplate language file1 file2 ...\n\nFile names containing multiple words are handled by simply placing a set of quotation marks around the file name argument.\n\nSupported languages: (beside each language name is the accompanying argument to supply to plate. C/h is a C file with accompanying .h file. C++/h is a C++ file with accompanying .h file)\nText         txt\nC             c\nC++           c++\n.h            h\nC/h           ch\nC++/h         c++h\nGoogle Go     go\nHaskell       haskell\nProlog        prolog\nPython        python\nJavascript    javascript\nCoffeeScript  coffeescript\nHTML          html\nHTML/script   htmlscript\nCSS           css\nRuby          ruby\nJQuery        jquery\nPHP           php\nScala         scala\nErlang        erlang\nML            ml\n\nA number of scripts are also available:\nsh            sh\nbash          bash\nksh           ksh\nzsh           zsh\ncsh           csh\nPERL script   perls\nNode script   nodescript\nPython Script pythonscript\nscala script  scalascript\n\nSimple Makefiles of the following types are also available:\n\nC makefile          cmake\nC++ makefile        c++make\nc w/ .h and make    chmake\nc++ w/ .h and make  c++hmake\n\n";
+    char help[] = "\n\n          __________   ___            _____    ___________   __________\n         /  ____   /  /  /          /  ___  \\  \\____   ___\\  \\   ______\\\n        /  /___/  /  /  /          /  /___\\  \\      \\  \\      \\  \\_____\n       /  _______/  /  /          /  _______  \\      \\  \\      \\   ____\\\n      /  /         /  /_______   /  /       \\  \\      \\  \\      \\  \\______\n     /__/         /__________/  /__/         \\__\\      \\__\\      \\________\\\n\nPlate is a UNIX program which provides a file containing a simple template for a requested programming language, shell script, makefile, or LaTeX file structure.\n\nTo use Plate, simply provide the following command to the terminal:\n\n\tplate language filename\n\nPlate can handle creating multiple simply by adding more arguments to the input command.\n\nFor example:\n\n\tplate language file1 file2 ...\n\nFile names containing multiple words are handled by simply placing a set of quotation marks around the file name argument.\n\nSupported languages: (beside each language name is the accompanying argument to supply to plate. C/h is a C file with accompanying .h file. C++/h is a C++ file with accompanying .h file)\nText         txt\nC             c\nC++           c++\n.h            h\nC/h           ch\nC++/h         c++h\nGoogle Go     go\nHaskell       haskell\nProlog        prolog\nPython        python\nJavascript    javascript\nCoffeeScript  coffeescript\nHTML          html\nHTML/script   htmlscript\nCSS           css\nRuby          ruby\nJQuery        jquery\nPHP           php\nScala         scala\nErlang        erlang\nML            ml\n\nA number of scripts are also available:\nsh            sh\nbash          bash\nksh           ksh\nzsh           zsh\ncsh           csh\nPERL script   perls\nNode script   nodescript\nPython Script pythonscript\nscala script  scalascript\n\nSimple Makefiles of the following types are also available:\n\nC makefile          cmake\nC++ makefile        c++make\nc w/ .h and make    chmake\nc++ w/ .h and make  c++hmake\n\nThe following project templates are also available:\n\nC project:          cproj\n\n";
         printf( "%s", help );
 }
 
@@ -54,7 +54,6 @@ void uppercaser( char *string ) {
 */
 int anlzstr( char* str ) { // this will probably be pretty ugly. Big block of ifs
     int sum = calcstrsum( str );
-
     switch ( sum ) {
         case TXT:        if ( strcmp( str, "txt" ) == 0 )            return TXT;
         case CLANG:      if ( strcmp( str, "c" ) == 0 )              return CLANG;
@@ -63,6 +62,7 @@ int anlzstr( char* str ) { // this will probably be pretty ugly. Big block of if
         case CPLUSPLUS:  if ( strcmp( str, "c++" ) == 0 )            return CPLUSPLUS;
         case CPPMAKE:    if ( strcmp( str, "c++make" ) == 0 )        return CPPMAKE;
         case CPPHMAKE:   if ( strcmp( str, "c++hmake" ) == 0 )       return CPPHMAKE;
+        case CPROJ:      if ( strcmp( str, "cproj" ) == 0 )          return CPROJ;
         case HFILE:      if ( strcmp( str, "h" ) == 0 )              return HFILE;
         case CH:         if ( strcmp( str, "ch" ) == 0 )             return CH;
         case CPPH:       if ( strcmp( str, "c++h" ) == 0 )           return CPPH;
@@ -96,10 +96,242 @@ int anlzstr( char* str ) { // this will probably be pretty ugly. Big block of if
     return 1;
 }
 
+int txt(char** filenames, char* lang, int numfiles) {
+    for (int i = 2; i < numfiles; i++) {
+        if ( fileexists( filenames[i] ) ) {  
+            printf( "The file %s already exists!\n", filenames[i] );
+            return -1;
+        }
+        else {
+            createfile( filenames[i], "" );
+        }
+    }
+    return 0;
+
+}
+
+int clang(char** filenames, char* lang, int numfiles) {
+    char *name;
+    int err;
+    for (int i = 2; i < numfiles; i++) {
+        err = asprintf( &name, "%s.c", filenames[i] );
+        if (err == -1) {
+            printf("There was an issue allocating memory for the filename!\n");
+            return -1;
+        }
+        if ( fileexists( name ) ) {  
+            printf( "The file %s already exists!\n", name );
+            return -1;
+        }
+        else {
+            char templ[] = "#include <stdio.h>\n\nint main(int argc, char* argv[]){\n    printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n";
+            createfile( name, templ );
+            free( name );
+            name = NULL;
+        }
+    }
+    return 0;
+}
+
+int cplusplus(char** filenames, char* lang, int numfiles) {
+    char *name;
+    int err;
+    for (int i = 2; i < numfiles; i++) {
+        err = asprintf( &name, "%s.cc", filenames[i] );
+        if (err == -1) {
+            printf("There was an issue allocating memory for the filename!\n");
+            return -1;
+        }
+        if ( fileexists( name ) ) {  
+            printf( "The file %s already exists!\n", name );
+            return -1;
+        } else {
+            char templ[] = "#include <iostream>\n\nusing namespace std;\n\nint main(int argc, char* argv[]){\n    cout << \"Hello World!\" << endl;\n\n    return 0;\n}\n";
+            createfile( name, templ );
+            free( name );
+            name = NULL;
+        }
+    }
+    return 0;
+}
+
+int hfile(char** filenames, char* lang, int numfiles) {
+    char *name;
+    int err;
+    for (int i = 2; i < numfiles; i++) {
+        err = asprintf( &name, "%s.h", filenames[i] );
+        if (err == -1) {
+            printf("There was an issue allocating memory for the filename!\n");
+            return -1;
+        }
+        if ( fileexists( name ) ) {  
+            printf("The file %s already exists!\n", name);
+            return -1;
+        } else {
+            char *upper;
+            err = asprintf( &upper, "%s", filenames[i] );
+            uppercaser( upper );
+            char *templ;
+            err = asprintf( &templ,  "#ifndef _%s_\n#define _%s_\n\n#include <stdio.h>\n\n\n\n\n#endif\n", upper, upper );
+            createfile( name, templ );
+            free( name );
+            name = NULL;
+            free( upper );
+            upper = NULL;
+        }
+    }
+    return 0;
+}
+
+int ch(char** filenames, char* lang, int numfiles) {
+    char *name;
+    int err;
+    for (int i = 2; i < numfiles; i++) {
+        err = asprintf( &name, "%s.c", filenames[i] );
+        char *chfile;
+        err = asprintf( &chfile, "%s.h", filenames[i] );
+        if ( fileexists( name ) || fileexists( chfile ) ) {  
+            printf( "The file %s or %s already exists!\n", name, chfile );
+            return -1;
+        } else {
+            char *ctempl;
+            err = asprintf( &ctempl, "#include \"%s\"\n\nint main(int argc, char* argv[]){\n    printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n", chfile, "%s" );
+            createfile( name, ctempl );
+            char *upper;
+            err = asprintf( &upper, "%s", filenames[i] );
+            uppercaser( upper );
+            char *htempl;
+            err = asprintf( &htempl, "#ifndef _%s_\n#define _%s_\n\n#include <stdio.h>\n\n\n\n\n#endif\n", upper, upper );
+            createfile( chfile, htempl );
+            free( name );
+            name = NULL;
+            free( chfile );
+            chfile = NULL;
+            free( ctempl );
+            ctempl = NULL;
+            free( htempl );
+            htempl = NULL;
+        }
+    }
+    return 0;
+}
+
+int cpph(char** filenames, char* lang, int numfiles) {
+    char *name;
+    int err;
+    for (int i = 2; i < numfiles; i++) {
+        err = asprintf( &name, "%s.cc", filenames[i] );  // for future reference, cannot start switch cases/if statements with declarations, must start with statements or else will not compile!
+        char *hfile;
+        err = asprintf( &hfile, "%s.h", filenames[i] );
+        if (fileexists( name ) || fileexists( hfile ) ) {  printf( "The file %s or %s already exists!\n", name, hfile );
+            return -1;
+        } else {
+            char *ctempl;
+            err = asprintf( &ctempl, "#include \"%s\"\n\nusing namespace std;\n\nint main(int argc, char* argv[]){\n    cout << \"Hello World!\" << endl;\n\n    return 0;\n}\n", hfile );
+            createfile(name, ctempl);
+            char *upper;
+            err = asprintf( &upper, "%s", filenames[i] );
+            uppercaser( upper );
+            char *htempl;
+            err = asprintf( &htempl, "#ifndef _%s_\n#define _%s_\n\n#include <iostream>\n\n\n\n\n#endif\n", upper, upper );
+            createfile( hfile, htempl );
+            free( name );
+            name = NULL;
+            free( hfile );
+            hfile = NULL;
+            free( ctempl );
+            ctempl = NULL;
+            free( upper );
+            upper = NULL;
+            free( htempl );
+            htempl = NULL;
+        }
+    }
+    return 0;
+}
+
+int cmake(char** filenames, char* lang, int numfiles) {
+    char *name;
+    int err;
+    for (int i = 2; i < numfiles; i++) {
+        err = asprintf( &name, "%s.c", filenames[i] );
+        if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );
+            return -1;
+        } else {
+            char templ[] = "#include <stdio.h>\n\nint main(int argc, char* argv[]){\n    printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n";
+            createfile(name, templ);
+            char *make;
+            printf("1\n");
+            err = asprintf( &make, "C=gcc\nCFLAGS=-Wall -pedantic\n\nexecutables=%s\n\n%s.o: %s\n\t$(C) $(CFLAGS) %s -o %s\n\nclean:\n\trm -rf %s\n\n", filenames[i], filenames[i], name, name, filenames[i], filenames[i] );
+            createfile( "makefile", make );
+            free( name );
+            name = NULL;
+            free( make );
+            make = NULL;
+        }
+    }
+    return 0;
+}
+
+
+// THIS NEEDS TO BE REDONE
+int chmake(char** filenames, char* lang, int numfiles) {
+    char *name;
+    int err;
+    for (int i = 2; i < numfiles; i++) {
+        err = asprintf( &name, "%s.c", filenames[i] );
+        if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );
+            return -1;
+        }
+        else {
+            err = asprintf( &name, "%s.c", filenames[i] );
+            char *chmfile;
+            err = asprintf( &chmfile, "%s.h", filenames[i] );
+            if ( fileexists( name ) || fileexists( chmfile ) ) {  printf( "The file %s or %s already exists!\n", name, chmfile );
+                return -1;
+            } else {
+                char *ctempl;
+                err = asprintf( &ctempl, "#include \"%s\"\n\nint main(int argc, char* argv[]){\n    printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n", chmfile, "%s" ); // sshhhh don't tell
+                createfile( name, ctempl );
+                char *upper;
+                err = asprintf( &upper, "%s", filenames[i] );
+                uppercaser( upper );
+                char *htempl;
+                err = asprintf( &htempl, "#ifndef _%s_\n#define _%s_\n\n#include <stdio.h>\n\n\n\n\n#endif\n", upper, upper );
+                createfile(chmfile, htempl);
+                char *make;
+                err = asprintf( &make, "C=gcc\nCFLAGS=-Wall -pedantic\n\nexecutables=%s\n\n%s.o: %s\n\t$(C) $(CFLAGS) %s -o %s\n\nclean:\n\trm -rf %s\n\n", filenames[i], filenames[i], name, name, filenames[i], filenames[i] );
+                createfile( "makefile", make );
+                free( name );
+                name = NULL;
+                free( chmfile );
+                chmfile = NULL;
+                free( ctempl );
+                ctempl = NULL;
+                free( upper );
+                upper = NULL;
+                free( htempl );
+                htempl = NULL;
+                free( make );
+                make = NULL;
+            }
+        }
+    }
+    return 0;
+}
+
+
+
 /* makes a file by looking at the language it is supposed to be, adjusting filenames accordingly, and then passing the relevant info to a helper function */
 void makefile( char** filenames, char* lang, int numfiles ) {
 
     int err = 0;
+
+    // This flag is used as a way to combine projects with the standard plate file creation functions. With projects, it works like
+    // makefiles, the first name input is the name of the project, and the rest will just be files included with the project.
+    // When this is set, creation of new projects will be skipped for the rest of the iterations through filenames
+    static int proj_flag = FALSE;
+
     int namesum = anlzstr( lang ); // little trick so I can use a switch statement rather than a huge chain of if/else if statements. Much more concise.
     if ( namesum == 1 ) return; // the case where argv[1] was either the wrong input or was malicious
     for ( int i = 2; i < numfiles; i++ ) {
@@ -107,155 +339,36 @@ void makefile( char** filenames, char* lang, int numfiles ) {
         
         switch ( namesum ) {
             case TXT:  // text files. Most would just use touch to make empty files but since this takes like 5 seconds to implement included it anyway
-                if ( fileexists( filenames[i] ) ) {  printf( "The file %s already exists!\n", filenames[i] );  break;}
-                else {
-                    createfile( filenames[i], "" );
-                }
+                err = txt(filenames, lang, numfiles);
                 break; 
 
             case CLANG: // C file case
-                err = asprintf( &name, "%s.c", filenames[i] );
-		        if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
-                    else {
-                    char templ[] = "#include <stdio.h>\n\nint main(int argc, char* argv[]){\n    printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n";
-                    createfile( name, templ );
-                    free( name );
-                    name = NULL;
-                }
+                err = clang(filenames, lang, numfiles);
                 break;
 
             case CPLUSPLUS: // C++ file case
-                err = asprintf( &name, "%s.cc", filenames[i] );
-                if ( fileexists( name ) ) {  printf("The file %s already exists!\n", name);  break;}
-                    else {
-                    char templ[] = "#include <iostream>\n\nusing namespace std;\n\nint main(int argc, char* argv[]){\n    cout << \"Hello World!\" << endl;\n\n    return 0;\n}\n";
-                    createfile( name, templ );
-                    free( name );
-                    name = NULL;
-                }
+                err = cplusplus(filenames, lang, numfiles);
                 break;
                 
             case HFILE: // .h file case. 
-                err = asprintf( &name, "%s.h", filenames[i] );
-                if ( fileexists( name ) ) {  printf("The file %s already exists!\n", name);  break;}
-                else {
-                    char *upper;
-                    err = asprintf( &upper, "%s", filenames[i] );
-                    uppercaser( upper );
-                    char *templ;
-                    templ = malloc ( sizeof("#ifndef __\n#define __\n\n#include <stdio.h>\n\n\n\n\n#endif\n") + 2 * ( sizeof( upper ) ) + 4 ); // yeah I know it's ugly as all hell but it works
-                    sprintf( templ,  "#ifndef _%s_\n#define _%s_\n\n#include <stdio.h>\n\n\n\n\n#endif\n", upper, upper );
-                    createfile( name, templ );
-                    free( name );
-                    name = NULL;
-                    free( upper );
-                    upper = NULL;
-                }
+                err = hfile(filenames, lang, numfiles);
                 break;
 
             case CH: // C file with an accompanying .h file.
-                err = asprintf( &name, "%s.c", filenames[i] );
-                char *chfile;
-                err = asprintf( &chfile, "%s.h", filenames[i] );
-                if ( fileexists( name ) || fileexists( chfile ) ) {  printf( "The file %s or %s already exists!\n", name, chfile );  break;}
-                    else {
-                    char *ctempl;
-                    err = asprintf( &ctempl, "#include \"%s\"\n\nint main(int argc, char* argv[]){\n    printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n", chfile, "%s" );
-                    createfile( name, ctempl );
-                    char *upper;
-                    err = asprintf( &upper, "%s", filenames[i] );
-                    uppercaser( upper );
-                    char *htempl;
-                    err = asprintf( &htempl, "#ifndef _%s_\n#define _%s_\n\n#include <stdio.h>\n\n\n\n\n#endif\n", upper, upper );
-                    createfile( chfile, htempl );
-                    free( name );
-                    name = NULL;
-                    free( chfile );
-                    chfile = NULL;
-                    free( ctempl );
-                    ctempl = NULL;
-                    free( htempl );
-                    htempl = NULL;
-                }
+                err = ch(filenames, lang, numfiles);
                 break;
 
             case CPPH: // C++ wih header file
-                err = asprintf( &name, "%s.c", filenames[i] );  // for future reference, cannot start switch cases/if statements with declarations, must start with statements or else will not compile!
-                char *hfile;
-                err = asprintf( &hfile, "%s.h", filenames[i] );
-                if (fileexists( name ) || fileexists( hfile ) ) {  printf( "The file %s or %s already exists!\n", name, hfile );  break;}
-                    else {
-                    char *ctempl;
-                    err = asprintf( &ctempl, "#include \"%s\"\n\nusing namespace std;\n\nint main(int argc, char* argv[]){\n    cout << \"Hello World!\" << endl;\n\n    return 0;\n}\n", hfile );
-                    createfile(name, ctempl);
-                    char *upper;
-                    err = asprintf( &upper, "%s", filenames[i] );
-                    uppercaser( upper );
-                    char *htempl;
-                    err = asprintf( &htempl, "#ifndef _%s_\n#define _%s_\n\n#include <iostream>\n\n\n\n\n#endif\n", upper, upper );
-                    createfile( hfile, htempl );
-                    free( name );
-                    name = NULL;
-                    free( hfile );
-                    hfile = NULL;
-                    free( ctempl );
-                    ctempl = NULL;
-                    free( upper );
-                    upper = NULL;
-                    free( htempl );
-                    htempl = NULL;
-                }
+                err = cpph(filenames, lang, numfiles);
                 break;
 
             case CMAKE:
-                err = asprintf( &name, "%s.c", filenames[i] );
-                if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
-                    else {
-                    char templ[] = "#include <stdio.h>\n\nint main(int argc, char* argv[]){\n    printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n";
-                    createfile(name, templ);
-                    char *make;
-                    err = asprintf( &make, "C=gcc\nCFLAGS=-Wall -pedantic\n\nexecutables=%s\n\n%s.o: %s\n\t$(C) $(CFLAGS) %s -o %s\n\nclean:\n\trm -rf %s\n\n", filenames[i], filenames[i], name, name, filenames[i], filenames[i] );
-                    createfile( "makefile", make );
-                    free( name );
-                    name = NULL;
-                    free( make );
-                    make = NULL;
-                }
+                err = cmake(filenames, lang, numfiles);
                 break;
 
             case CHMAKE: // C file with an accompanying .h file and makefile
-                err = asprintf( &name, "%s.c", filenames[i] );
-                char *chmfile;
-                err = asprintf( &chmfile, "%s.h", filenames[i] );
-                if ( fileexists( name ) || fileexists( chmfile ) ) {  printf( "The file %s or %s already exists!\n", name, chmfile );  break;}
-                    else {
-                    char *ctempl;
-                    err = asprintf( &ctempl, "#include \"%s\"\n\nint main(int argc, char* argv[]){\n    printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n", chmfile, "%s" ); // sshhhh don't tell
-                    createfile( name, ctempl );
-                    char *upper;
-                    err = asprintf( &upper, "%s", filenames[i] );
-                    uppercaser( upper );
-                    char *htempl;
-                    err = asprintf( &htempl, "#ifndef _%s_\n#define _%s_\n\n#include <stdio.h>\n\n\n\n\n#endif\n", upper, upper );
-                    createfile(chmfile, htempl);
-                    char *make;
-                    err = asprintf( &make, "C=gcc\nCFLAGS=-Wall -pedantic\n\nexecutables=%s\n\n%s.o: %s\n\t$(C) $(CFLAGS) %s -o %s\n\nclean:\n\trm -rf %s\n\n", filenames[i], filenames[i], name, name, filenames[i], filenames[i] );
-                    createfile( "makefile", make );
-                    free( name );
-                    name = NULL;
-                    free( chmfile );
-                    chmfile = NULL;
-                    free( ctempl );
-                    ctempl = NULL;
-                    free( upper );
-                    upper = NULL;
-                    free( htempl );
-                    htempl = NULL;
-                    free( make );
-                    make = NULL;
-                }
+                err = chmake(filenames, lang, numfiles);
             	break;
-
             case CPPMAKE:
                 err = asprintf( &name, "%s.cc", filenames[i] );
                 if ( fileexists( name ) ) {  printf( "The file %s already exists!\n", name );  break;}
@@ -591,6 +704,62 @@ void makefile( char** filenames, char* lang, int numfiles ) {
                 }
                 break;
                 
+            case CPROJ: 
+                if (!proj_flag) {
+                proj_flag = TRUE;
+                err = asprintf( &name, "%s", filenames[2] );
+                struct stat dir = {0};
+                // THIS MAKING DIRECTORIES IS WAY MORE COMPLICATED THAN IT NEEDS TO BE
+                if ( stat(name, &dir) == -1) {  // make sure the directory doesn't exist. stat returns -1 if it doesn't
+                    mode_t process_mask = umask(0);
+                    mkdir(name, S_IRWXU | S_IROTH | S_IRGRP | S_IXOTH | S_IXGRP);
+                    err = asprintf( &name, "%s/headers", filenames[2] );
+                    mkdir(name, S_IRWXU | S_IROTH | S_IRGRP | S_IXOTH | S_IXGRP);
+                    err = asprintf( &name, "%s/bin", filenames[2] );
+                    mkdir(name, S_IRWXU | S_IROTH | S_IRGRP | S_IXOTH | S_IXGRP);
+                    umask(process_mask);
+                    
+                    // now onto the more straightforward part:
+                    err = asprintf( &name, "%s/%s.c", filenames[2], filenames[i] );
+                    char *chmfile;
+                    err = asprintf( &chmfile, "%s/headers/%s.h", filenames[2], filenames[i] );
+                    if ( fileexists( name ) || fileexists( chmfile ) ) {  printf( "The file %s or %s already exists!\n", name, chmfile );  break;}
+                        else {
+                        char *ctempl;
+                        err = asprintf( &ctempl, "#include \"%s\"\n\nint main(int argc, char* argv[]){\n    printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n", chmfile, "%s" ); // sshhhh don't tell
+                        createfile( name, ctempl );
+                        char *upper;
+                        err = asprintf( &upper, "%s", filenames[i] );
+                        uppercaser( upper );
+                        char *htempl;
+                        err = asprintf( &htempl, "#ifndef _%s_\n#define _%s_\n\n#include <stdio.h>\n\n\n\n\n#endif\n", upper, upper );
+                        createfile(chmfile, htempl);
+                        char *make;
+                        printf("DONE\n" );
+                        err = asprintf( &make, "C=gcc\nCFLAGS=-Wall -pedantic\n\nexecutables=%s\n\nbin/%s.o: %s\n\t$(C) $(CFLAGS) %s -o bin/%s\n\nclean:\n\trm -rf bin/%s\n\n", filenames[i], filenames[i], name, name, filenames[i], filenames[i] );
+                        printf("1\n");
+                        createfile( "makefile", make );
+                        free( name );
+                        name = NULL;
+                        free( chmfile );
+                        chmfile = NULL;
+                        free( ctempl );
+                        ctempl = NULL;
+                        free( upper );
+                        upper = NULL;
+                        free( htempl );
+                        htempl = NULL;
+                        free( make );
+                        make = NULL;
+                    }
+
+                } else {
+                    printf("Sorry, that directory already exists. Move to a different directory to create the project.\n");
+                }
+                
+                }
+                break;
+
             default:
                 printf( "the file %s was not successfully created! Check command formatting. For help, use \"plate -h\" or \"plate help\"\n", filenames[i] );
         }
