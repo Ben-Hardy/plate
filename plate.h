@@ -2,8 +2,8 @@
 #define _PLATE_
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -13,7 +13,7 @@
 #define FALSE 0
 
 // the following are the sums of the ascii codes of various input strings
-#define TXT 352 
+#define TXT 352
 #define CLANG 99
 #define CPLUSPLUS 185
 #define CMAKE 513
