@@ -172,12 +172,12 @@ int checkstring(
 
   return 1;
 }
-
-// These are the two main functions that handle the actually creation of
-// templates. the only difference between them is that sh customizes the
-// file contents to the script type rather than have an inputted extention
-// and file contents
-
+/*
+    These are the two main functions that handle the actually creation of
+    templates. the only difference between them is that sh customizes the
+    file contents to the script type rather than have an inputted extention
+ and file contents
+*/
 int templatizer(char **filenames, char *ext, int numfiles, char *text) {
   char *name;
   int err;
@@ -214,13 +214,14 @@ int sh(char **filenames, char *lang, int numfiles) {
   return 0;
 }
 
-// Past the two main functions are a bunch of more specialized functions.
-// These functions handle special cases for certain filetypes. For example,
-// for C/C++ header files, it will ALL-CAPS the file name and put in in an
-// #ifndef setup that is standard fair for a header file.
-// Also included are some more advanced C/C++ based file/project creation tools
-// like a paired C file and header, or a C file, header, and custom makefile.
-
+/*
+   Past the two main functions are a bunch of more specialized functions.
+   These functions handle special cases for certain filetypes. For example,
+   for C/C++ header files, it will ALL-CAPS the file name and put in in an
+   #ifndef setup that is standard fair for a header file.
+   Also included are some more advanced C/C++ based file/project creation tools
+   like a paired C file and header, or a C file, header, and custom makefile.
+*/
 int hfile(char **filenames, int numfiles) {
   char *name;
   int err;
@@ -296,12 +297,11 @@ int cpph(char **filenames, int numfiles) {
   char *name;
   int err;
   for (int i = 2; i < numfiles; i++) {
-    err = asprintf(&name, "%s.cc", filenames[i]);  // for future reference,
-                                                   // cannot start switch
-                                                   // cases/if statements with
-                                                   // declarations, must start
-                                                   // with statements or else
-                                                   // will not compile!
+    err = asprintf(&name, "%s.cc", filenames[i]);  
+    /*
+        for future reference, cannot start switch cases/if statements with
+        declarations, must start with statements or else will not compile!
+    */
     char *hfile;
     err = asprintf(&hfile, "%s.h", filenames[i]);
     if (fileexists(name) || fileexists(hfile)) {
@@ -571,18 +571,22 @@ int scala(char **filenames, int numfiles) {
   return 0;
 }
 
-/* makes a file by looking at the language it is supposed to be, adjusting
- * filenames accordingly, and then passing the relevant info to a helper
- * function */
+/* 
+    makes a file by looking at the language it is supposed to be, adjusting
+    filenames accordingly, and then passing the relevant info to a helper
+    function 
+*/
 void makefile(char **filenames, char *lang, int numfiles) {
   int err = 0;
-
-  // This flag is used as a way to combine projects with the standard plate file
-  // creation functions. With projects, it works like
-  // makefiles, the first name input is the name of the project, and the rest
-  // will just be files included with the project.
-  // When this is set, creation of new projects will be skipped for the rest of
-  // the iterations through filenames
+  
+  /*
+      This flag is used as a way to combine projects with the standard plate file
+      creation functions. With projects, it works like
+      makefiles, the first name input is the name of the project, and the rest
+      will just be files included with the project.
+      When this is set, creation of new projects will be skipped for the rest of
+      the iterations through filenames
+  */
   static int proj_flag = FALSE;
 
   int namesum =
@@ -679,10 +683,11 @@ void makefile(char **filenames, char *lang, int numfiles) {
       case BASH:  // bash script
         err = sh(filenames, lang, numfiles);
         break;
-
-      // the one below is iffy. zsh is sometimes in usr/bin or usr/local/bin,
-      // depending on OS. On Mac, it is in usr/bin. On some Linux distros, it is
-      // in one of the three above directories.
+      /*
+          the one below is iffy. zsh is sometimes in usr/bin or usr/local/bin,
+          depending on OS. On Mac, it is in usr/bin. On some Linux distros, it is
+          in one of the two above directories.
+      */
       case ZSH:  // zsh script
         err = sh(filenames, lang, numfiles);
         break;
@@ -823,7 +828,6 @@ void makefile(char **filenames, char *lang, int numfiles) {
                              upper, upper);
               createfile(chmfile, htempl);
               char *make;
-              printf("DONE\n");
               err = asprintf(
                   &make,
                   "C=gcc\nCFLAGS=-Wall "
@@ -832,12 +836,11 @@ void makefile(char **filenames, char *lang, int numfiles) {
                   "bin/%s\n\nrun:\n\t./bin/%s\n\nclean:\n\trm -rf bin/%s\n\n",
                   filenames[i], filenames[i], filenames[i], filenames[i],
                   filenames[i], filenames[i], filenames[i]);
-              printf("1\n");
-              // printf("%s", make);
               char *makefilename;
               err = asprintf(&makefilename, "%s/makefile", filenames[i]);
               printf("%s", makefilename);
               createfile(makefilename, make);
+              
               free(name);
               name = NULL;
               free(chmfile);
