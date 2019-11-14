@@ -341,7 +341,15 @@ int cpph(char **filenames, int numfiles) {
 
 int cmake(char **filenames, int numfiles) {
   char *name;
+  int first = TRUE;
+  char *make = (char*) malloc(1024);
   int err;
+
+  if (fileexists("makefile")) {
+    printf("The file %s already exists!\n", "makefile");
+      return -1;
+    }
+
   for (int i = 2; i < numfiles; i++) {
     err = asprintf(&name, "%s.c", filenames[i]);
     if (fileexists(name)) {
@@ -352,20 +360,22 @@ int cmake(char **filenames, int numfiles) {
           "#include <stdio.h>\n\nint main(int argc, char* argv[]){\n    "
           "printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n";
       createfile(name, templ);
-      char *make;
-      printf("1\n");
-      err = asprintf(&make,
-                     "C=gcc\nCFLAGS=-Wall -pedantic\n\nexecutables=%s\n\n%s.o: "
-                     "%s\n\t$(C) $(CFLAGS) %s -o %s\n\nclean:\n\trm -rf %s\n\n",
-                     filenames[i], filenames[i], name, name, filenames[i],
-                     filenames[i]);
-      createfile("makefile", make);
       free(name);
       name = NULL;
-      free(make);
-      make = NULL;
+
     }
   }
+
+  err = asprintf(&name, "%s.c", filenames[0]);
+  err = asprintf(&make,
+                    "C=gcc\nCFLAGS=-Wall -pedantic\n\nexecutables=%s\n\n%s.o: "
+                    "%s\n\t$(C) $(CFLAGS) %s -o %s\n\nclean:\n\trm -rf %s\n\n",
+                    filenames[2], filenames[2], name, name, filenames[2],
+                    filenames[2]);
+  createfile("makefile", make);
+  free(make);
+  make = NULL;
+
   return 0;
 }
 
@@ -571,6 +581,88 @@ int scala(char **filenames, int numfiles) {
   return 0;
 }
 
+int cproject(char **filenames, int numfiles) {
+  int err;
+  char *name;
+  for (int i = 2; i < numfiles; i++) {
+    err = asprintf(&name, "%s", filenames[2]);
+    struct stat dir = {0};
+    // MAKING DIRECTORIES IS WAY MORE COMPLICATED THAN IT NEEDS TO BE
+    if (stat(name, &dir) == -1) {  // make sure the directory doesn't
+                                    // exist. stat returns -1 if it doesn't
+      mode_t process_mask = umask(0);
+      mkdir(name, S_IRWXU | S_IROTH | S_IRGRP | S_IXOTH | S_IXGRP);
+      err = asprintf(&name, "%s/headers", filenames[2]);
+      mkdir(name, S_IRWXU | S_IROTH | S_IRGRP | S_IXOTH | S_IXGRP);
+      err = asprintf(&name, "%s/bin", filenames[2]);
+      mkdir(name, S_IRWXU | S_IROTH | S_IRGRP | S_IXOTH | S_IXGRP);
+      umask(process_mask);
+
+      // now onto the more straightforward part:
+      err = asprintf(&name, "%s/%s.c", filenames[2], filenames[i]);
+      char *chmfile;
+      err = asprintf(&chmfile, "%s/headers/%s.h", filenames[2],
+                      filenames[i]);
+      if (fileexists(name) || fileexists(chmfile)) {
+        printf("The file %s or %s already exists!\n", name, chmfile);
+      } else {
+        char *ctempl;
+        err = asprintf(&ctempl,
+                        "#include \"headers/%s.h\"\n\nint main(int argc, "
+                        "char* argv[]){\n    printf(\"%s\", \"Hello "
+                        "world!\\n\");\n\n    return 0;\n}\n",
+                        filenames[i], "%s");
+        createfile(name, ctempl);
+        char *upper;
+        err = asprintf(&upper, "%s", filenames[i]);
+        uppercaser(upper);
+        char *htempl;
+        err = asprintf(&htempl,
+                        "#ifndef _%s_\n#define _%s_\n\n#include "
+                        "<stdio.h>\n\n\n\n\n#endif\n",
+                        upper, upper);
+        createfile(chmfile, htempl);
+        char *make;
+        err = asprintf(
+            &make,
+            "C=gcc\nCFLAGS=-Wall "
+            "-pedantic\n\nexecutables=%s\n\nbin/%s.o: %s.c\n\t$(C) "
+            "$(CFLAGS) %s.c -o "
+            "bin/%s\n\nrun:\n\t./bin/%s\n\nclean:\n\trm -rf bin/%s\n\n",
+            filenames[i], filenames[i], filenames[i], filenames[i],
+            filenames[i], filenames[i], filenames[i]);
+        char *makefilename;
+        err = asprintf(&makefilename, "%s/makefile", filenames[i]);
+        printf("%s", makefilename);
+        createfile(makefilename, make);
+        
+        free(name);
+        name = NULL;
+        free(chmfile);
+        chmfile = NULL;
+        free(ctempl);
+        ctempl = NULL;
+        free(upper);
+        upper = NULL;
+        free(htempl);
+        htempl = NULL;
+        free(make);
+        make = NULL;
+        free(makefilename);
+        makefilename = NULL;
+      }
+
+    } else {
+      printf(
+          "Sorry, that directory already exists. Move to a different "
+          "directory to create the project.\n");
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 /* 
     makes a file by looking at the language it is supposed to be, adjusting
     filenames accordingly, and then passing the relevant info to a helper
@@ -587,7 +679,6 @@ void makefile(char **filenames, char *lang, int numfiles) {
       When this is set, creation of new projects will be skipped for the rest of
       the iterations through filenames
   */
-  static int proj_flag = FALSE;
 
   int namesum =
       checkstring(lang);  // little trick so I can use a switch statement
@@ -596,281 +687,201 @@ void makefile(char **filenames, char *lang, int numfiles) {
   if (namesum == 1)
     return;  // the case where argv[1] was either the wrong input or was
              // malicious
-  for (int i = 2; i < numfiles; i++) {
-    char *name;
 
-    switch (namesum) {
-      case TXT:  // text files. Most would just use touch to make empty files
-                 // but since this takes like 5 seconds to implement included it
-                 // anyway
-        err = templatizer(filenames, "txt", numfiles, "");
-        break;
+  switch (namesum) {
+    case TXT:  // text files. Most would just use touch to make empty files
+                // but since this takes like 5 seconds to implement included it
+                // anyway
+      err = templatizer(filenames, "txt", numfiles, "");
+      break;
 
-      case CLANG:  // C file case
-        err = templatizer(
-            filenames, "c", numfiles,
-            "#include <stdio.h>\n\nint main(int argc, char* argv[]){\n    "
-            "printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n");
-        break;
+    case CLANG:  // C file case
+      err = templatizer(
+          filenames, "c", numfiles,
+          "#include <stdio.h>\n\nint main(int argc, char* argv[]){\n    "
+          "printf(\"%s\", \"Hello world!\\n\");\n\n    return 0;\n}\n");
+      break;
 
-      case CPLUSPLUS:  // C++ file case
-        err = templatizer(
-            filenames, "cc", numfiles,
-            "#include <iostream>\n\nusing namespace std;\n\nint main(int argc, "
-            "char* argv[]){\n    cout << \"Hello World!\" << endl;\n\n    "
-            "return "
-            "0;\n}\n");
-        break;
+    case CPLUSPLUS:  // C++ file case
+      err = templatizer(
+          filenames, "cc", numfiles,
+          "#include <iostream>\n\nusing namespace std;\n\nint main(int argc, "
+          "char* argv[]){\n    cout << \"Hello World!\" << endl;\n\n    "
+          "return "
+          "0;\n}\n");
+      break;
 
-      case HFILE:  // .h file case.
-        err = hfile(filenames, numfiles);
-        break;
+    case HFILE:  // .h file case.
+      err = hfile(filenames, numfiles);
+      break;
 
-      case CH:  // C file with an accompanying .h file.
-        err = ch(filenames, numfiles);
-        break;
+    case CH:  // C file with an accompanying .h file.
+      err = ch(filenames, numfiles);
+      break;
 
-      case CPPH:  // C++ wih header file
-        err = cpph(filenames, numfiles);
-        break;
+    case CPPH:  // C++ wih header file
+      err = cpph(filenames, numfiles);
+      break;
 
-      case CMAKE:
-        err = cmake(filenames, numfiles);
-        break;
+    case CMAKE:
+      err = cmake(filenames, numfiles);
+      break;
 
-      case CHMAKE:  // C file with an accompanying .h file and makefile
-        err = chmake(filenames, numfiles);
-        break;
-      case CPPMAKE:
-        err = cppmake(filenames, numfiles);
-        break;
+    case CHMAKE:  // C file with an accompanying .h file and makefile
+      err = chmake(filenames, numfiles);
+      break;
+    case CPPMAKE:
+      err = cppmake(filenames, numfiles);
+      break;
 
-      case CPPHMAKE:  // C++ wih header file
-        err = cpphmake(filenames, numfiles);
-        break;
+    case CPPHMAKE:  // C++ wih header file
+      err = cpphmake(filenames, numfiles);
+      break;
 
-      case JAVA:  // java!
-        err = java(filenames, numfiles);
-        break;
+    case JAVA:  // java!
+      err = java(filenames, numfiles);
+      break;
 
-      case PYTHON:  // python!
-        err =
-            templatizer(filenames, "py", numfiles,
-                        "import sys\n\n\ndef main():\n\tprint(\"Hello world!\")"
-                        "\n\n\nif __name__==\"__main__\":\n\tmain()\n");
-        break;
+    case PYTHON:  // python!
+      err =
+          templatizer(filenames, "py", numfiles,
+                      "import sys\n\n\ndef main():\n\tprint(\"Hello world!\")"
+                      "\n\n\nif __name__==\"__main__\":\n\tmain()\n");
+      break;
 
-      case GO:  // Google Go AKA golang
-        err = templatizer(
-            filenames, "go", numfiles,
-            "package main// change this as needed\n\nimport \"fmt\"\n\nfunc "
-            "main() {\n\tfmt.Printf(\"Hello World!\\n\")\n}\n");
-        break;
+    case GO:  // Google Go AKA golang
+      err = templatizer(
+          filenames, "go", numfiles,
+          "package main// change this as needed\n\nimport \"fmt\"\n\nfunc "
+          "main() {\n\tfmt.Printf(\"Hello World!\\n\")\n}\n");
+      break;
 
-      case SCALA:  // scala!
-        err = scala(filenames, numfiles);
-        break;
+    case SCALA:  // scala!
+      err = scala(filenames, numfiles);
+      break;
 
-      case HASKELL:  // haskell
-        err = templatizer(filenames, "hs", numfiles,
-                          "main = do\n\tputStrLn \"Hello World!\"");
-        break;
+    case HASKELL:  // haskell
+      err = templatizer(filenames, "hs", numfiles,
+                        "main = do\n\tputStrLn \"Hello World!\"");
+      break;
 
-      case SH:  // basic sh script
-        err = sh(filenames, lang, numfiles);
-        break;
+    case SH:  // basic sh script
+      err = sh(filenames, lang, numfiles);
+      break;
 
-      case BASH:  // bash script
-        err = sh(filenames, lang, numfiles);
-        break;
-      /*
-          the one below is iffy. zsh is sometimes in usr/bin or usr/local/bin,
-          depending on OS. On Mac, it is in usr/bin. On some Linux distros, it is
-          in one of the two above directories.
-      */
-      case ZSH:  // zsh script
-        err = sh(filenames, lang, numfiles);
-        break;
+    case BASH:  // bash script
+      err = sh(filenames, lang, numfiles);
+      break;
+    /*
+        the one below is iffy. zsh is sometimes in usr/bin or usr/local/bin,
+        depending on OS. On Mac, it is in usr/bin. On some Linux distros, it is
+        in one of the two above directories.
+    */
+    case ZSH:  // zsh script
+      err = sh(filenames, lang, numfiles);
+      break;
 
-      case KSH:  // ksh script
-        err = sh(filenames, lang, numfiles);
-        break;
+    case KSH:  // ksh script
+      err = sh(filenames, lang, numfiles);
+      break;
 
-      case CSH:  // csh script
-        err = sh(filenames, lang, numfiles);
-        break;
+    case CSH:  // csh script
+      err = sh(filenames, lang, numfiles);
+      break;
 
-      case PERL:  // Perl script
-        err = templatizer(filenames, "", numfiles,
-                          "#!/usr/bin/perl\nprint(\"Hello World!\\n\");\n");
-        break;
+    case PERL:  // Perl script
+      err = templatizer(filenames, "", numfiles,
+                        "#!/usr/bin/perl\nprint(\"Hello World!\\n\");\n");
+      break;
 
-      case SCALAS:  // scala script
-        err = templatizer(filenames, "", numfiles, "#!/usr/bin/env scala\n\n");
-        break;
+    case SCALAS:  // scala script
+      err = templatizer(filenames, "", numfiles, "#!/usr/bin/env scala\n\n");
+      break;
 
-      case NODES:  // node script
-        err = templatizer(filenames, "", numfiles, "#!/usr/bin/env node\n\n");
-        break;
+    case NODES:  // node script
+      err = templatizer(filenames, "", numfiles, "#!/usr/bin/env node\n\n");
+      break;
 
-      case PYTHONS:  // python script
-        err = templatizer(filenames, "", numfiles, "#!/usr/bin/env python\n\n");
-        break;
+    case PYTHONS:  // python script
+      err = templatizer(filenames, "", numfiles, "#!/usr/bin/env python\n\n");
+      break;
 
-      case HTML:  // basic html file
-        err = templatizer(
-            filenames, "html", numfiles,
-            "<!DOCTYPE html>\n<html>\n<link href=\"stylesheet.css\" "
-            "rel=\"stylesheet\" type=\"text/css\" />\n<meta "
-            "charset=\"utf-8\">\n\n<head>\n\t<title>TITLE GOES "
-            "HERE</title>\n</head>\n\n<body>\n\t<p>\n\t\tThis is some "
-            "text\n\t</p>\n</body>\n</html>\n");
-        break;
+    case HTML:  // basic html file
+      err = templatizer(
+          filenames, "html", numfiles,
+          "<!DOCTYPE html>\n<html>\n<link href=\"stylesheet.css\" "
+          "rel=\"stylesheet\" type=\"text/css\" />\n<meta "
+          "charset=\"utf-8\">\n\n<head>\n\t<title>TITLE GOES "
+          "HERE</title>\n</head>\n\n<body>\n\t<p>\n\t\tThis is some "
+          "text\n\t</p>\n</body>\n</html>\n");
+      break;
 
-      case HTMLS:  // html with script tag
-        err = templatizer(
-            filenames, "html", numfiles,
-            "<!DOCTYPE html>\n<html>\n<link href=\"stylesheet.css\" "
-            "rel=\"stylesheet\" type=\"text/css\" />\n<meta "
-            "charset=\"utf-8\">\n\n<head>\n\t<title>TITLE GOES "
-            "HERE</title>\n</head>\n<script>\n\n</"
-            "script>\n<body>\n\t<p>\n\t\tThis is some "
-            "text\n\t</p>\n</body>\n</html>\n");
-        break;
+    case HTMLS:  // html with script tag
+      err = templatizer(
+          filenames, "html", numfiles,
+          "<!DOCTYPE html>\n<html>\n<link href=\"stylesheet.css\" "
+          "rel=\"stylesheet\" type=\"text/css\" />\n<meta "
+          "charset=\"utf-8\">\n\n<head>\n\t<title>TITLE GOES "
+          "HERE</title>\n</head>\n<script>\n\n</"
+          "script>\n<body>\n\t<p>\n\t\tThis is some "
+          "text\n\t</p>\n</body>\n</html>\n");
+      break;
 
-      case CSS:  // rudementary CSS file
-        err = templatizer(filenames, "css", numfiles, "body {\n\n}\n");
-        break;
+    case CSS:  // rudementary CSS file
+      err = templatizer(filenames, "css", numfiles, "body {\n\n}\n");
+      break;
 
-      case JAVASCRIPT:  // basic javascript file with a makeshift main since
-                        // main isn't required in JS
-        err = templatizer(
-            filenames, "js", numfiles,
-            "\n\nfunction main() {\n\tconsole.log(\"Hello World!\");\n} "
-            "\n\nmain();\n");
-        break;
+    case JAVASCRIPT:  // basic javascript file with a makeshift main since
+                      // main isn't required in JS
+      err = templatizer(
+          filenames, "js", numfiles,
+          "\n\nfunction main() {\n\tconsole.log(\"Hello World!\");\n} "
+          "\n\nmain();\n");
+      break;
 
-      case RUBY:  // ruby
-        err =
-            templatizer(filenames, "rb", numfiles, "puts \"Hello World!\"\n\n");
-        break;
+    case RUBY:  // ruby
+      err =
+          templatizer(filenames, "rb", numfiles, "puts \"Hello World!\"\n\n");
+      break;
 
-      case JQUERY:  // JQuery
-        err = templatizer(filenames, "js", numfiles,
-                          "$(document).ready(function() {\n\n});\n");
-        break;
+    case JQUERY:  // JQuery
+      err = templatizer(filenames, "js", numfiles,
+                        "$(document).ready(function() {\n\n});\n");
+      break;
 
-      case PHP:  // PHP for posterity's sake
-        err = templatizer(filenames, "php", numfiles,
-                          "<?php\n\necho \"Hello World!\"\n\n?>\n");
-        break;
+    case PHP:  // PHP for posterity's sake
+      err = templatizer(filenames, "php", numfiles,
+                        "<?php\n\necho \"Hello World!\"\n\n?>\n");
+      break;
 
-      case OCAML:  // Objective-CAML
-        err = templatizer(
-            filenames, "ml", numfiles,
-            "let main () =\n\tPrintf.printf \"Hello World!\\n\"\n\nlet _ = "
-            "main ()\n");
-        break;
+    case OCAML:  // Objective-CAML
+      err = templatizer(
+          filenames, "ml", numfiles,
+          "let main () =\n\tPrintf.printf \"Hello World!\\n\"\n\nlet _ = "
+          "main ()\n");
+      break;
 
-      case ERLANG:  // erlang!
-        err = templatizer(filenames, "erl", numfiles, "\n");
-        break;
+    case ERLANG:  // erlang!
+      err = templatizer(filenames, "erl", numfiles, "\n");
+      break;
 
-      case COFFEE:  // coffeescript
-        err = templatizer(filenames, "coffee", numfiles,
-                          "Console.log(\"Hello World!\")\n\n");
-        break;
+    case COFFEE:  // coffeescript
+      err = templatizer(filenames, "coffee", numfiles,
+                        "Console.log(\"Hello World!\")\n\n");
+      break;
 
-      case MD:  // markdown
-        err = templatizer(filenames, "md", numfiles, "# Title\n\n## Header 1");
-        break;
+    case MD:  // markdown
+      err = templatizer(filenames, "md", numfiles, "# Title\n\n## Header 1");
+      break;
 
-      case CPROJ:  // this was more of an exercise in learning file operations
-                   // in C than anything. It actually works.
-        if (!proj_flag) {
-          proj_flag = TRUE;
-          err = asprintf(&name, "%s", filenames[2]);
-          struct stat dir = {0};
-          // MAKING DIRECTORIES IS WAY MORE COMPLICATED THAN IT NEEDS TO BE
-          if (stat(name, &dir) == -1) {  // make sure the directory doesn't
-                                         // exist. stat returns -1 if it doesn't
-            mode_t process_mask = umask(0);
-            mkdir(name, S_IRWXU | S_IROTH | S_IRGRP | S_IXOTH | S_IXGRP);
-            err = asprintf(&name, "%s/headers", filenames[2]);
-            mkdir(name, S_IRWXU | S_IROTH | S_IRGRP | S_IXOTH | S_IXGRP);
-            err = asprintf(&name, "%s/bin", filenames[2]);
-            mkdir(name, S_IRWXU | S_IROTH | S_IRGRP | S_IXOTH | S_IXGRP);
-            umask(process_mask);
-
-            // now onto the more straightforward part:
-            err = asprintf(&name, "%s/%s.c", filenames[2], filenames[i]);
-            char *chmfile;
-            err = asprintf(&chmfile, "%s/headers/%s.h", filenames[2],
-                           filenames[i]);
-            if (fileexists(name) || fileexists(chmfile)) {
-              printf("The file %s or %s already exists!\n", name, chmfile);
-              break;
-            } else {
-              char *ctempl;
-              err = asprintf(&ctempl,
-                             "#include \"headers/%s.h\"\n\nint main(int argc, "
-                             "char* argv[]){\n    printf(\"%s\", \"Hello "
-                             "world!\\n\");\n\n    return 0;\n}\n",
-                             filenames[i], "%s");
-              createfile(name, ctempl);
-              char *upper;
-              err = asprintf(&upper, "%s", filenames[i]);
-              uppercaser(upper);
-              char *htempl;
-              err = asprintf(&htempl,
-                             "#ifndef _%s_\n#define _%s_\n\n#include "
-                             "<stdio.h>\n\n\n\n\n#endif\n",
-                             upper, upper);
-              createfile(chmfile, htempl);
-              char *make;
-              err = asprintf(
-                  &make,
-                  "C=gcc\nCFLAGS=-Wall "
-                  "-pedantic\n\nexecutables=%s\n\nbin/%s.o: %s.c\n\t$(C) "
-                  "$(CFLAGS) %s.c -o "
-                  "bin/%s\n\nrun:\n\t./bin/%s\n\nclean:\n\trm -rf bin/%s\n\n",
-                  filenames[i], filenames[i], filenames[i], filenames[i],
-                  filenames[i], filenames[i], filenames[i]);
-              char *makefilename;
-              err = asprintf(&makefilename, "%s/makefile", filenames[i]);
-              printf("%s", makefilename);
-              createfile(makefilename, make);
-              
-              free(name);
-              name = NULL;
-              free(chmfile);
-              chmfile = NULL;
-              free(ctempl);
-              ctempl = NULL;
-              free(upper);
-              upper = NULL;
-              free(htempl);
-              htempl = NULL;
-              free(make);
-              make = NULL;
-              free(makefilename);
-              makefilename = NULL;
-            }
-
-          } else {
-            printf(
-                "Sorry, that directory already exists. Move to a different "
-                "directory to create the project.\n");
-          }
-        }
-        break;
-
-      default:
-        printf(
-            "the file %s was not successfully created! Check command "
-            "formatting. For help, use \"plate -h\" or \"plate help\"\n",
-            filenames[i]);
-    }
+    case CPROJ:  // this was more of an exercise in learning file operations
+                  // in C than anything. It actually works.
+      cproject(filenames, numfiles);
+      break;
+    default:
+      printf(
+          "the file was not successfully created! Check command "
+          "formatting. For help, use \"plate -h\" or \"plate help\"\n");
   }
   if (err == -1)
     printf("There is something wrong. Check above output to see why!");
@@ -883,6 +894,6 @@ int main(int argc, char **argv) {
   else {
     makefile(argv, argv[1], argc);
   }
-
+  printf("Testing");
   return 0;
 }
